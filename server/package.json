@@ -1,0 +1,20 @@
+{
+  "name": "webrtc-signaling-server",
+  "version": "1.0.0",
+  "main": "signaling-server.js",
+  "scripts": {
+    "start": "ts-node signaling-server.ts",
+    "dev": "nodemon --exec ts-node signaling-server.ts",
+    "build": "tsc",
+    "serve": "node dist/signaling-server.js"
+  },
+  "dependencies": {
+    "ws": "^8.2.3"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.5.4",
+    "nodemon": "^2.0.15",
+    "typescript": "^4.5.4",
+    "ts-node": "^10.4.0"
+  }
+}
