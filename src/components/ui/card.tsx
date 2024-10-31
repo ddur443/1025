@@ -163,4 +163,61 @@ const BulletinBoard: React.FC<BulletinBoardProps> = ({ updates, onPostUpdate, ..
   );
 };
 
-export { Card, CardHeader, CardContent, BulletinBoard }
+// Form to input data for the new node
+export interface NodeFormProps {
+  onSubmit: (data: NodeData) => void;
+}
+
+export interface NodeData {
+  id: string;
+  label: string;
+  description: string;
+  type: string;
+}
+
+const NodeForm: React.FC<NodeFormProps> = ({ onSubmit }) => {
+  const [nodeData, setNodeData] = React.useState<NodeData>({
+    id: '',
+    label: '',
+    description: '',
+    type: ''
+  });
+
+  const handleSubmit = () => {
+    onSubmit(nodeData);
+    setNodeData({
+      id: '',
+      label: '',
+      description: '',
+      type: ''
+    });
+  };
+
+  return (
+    <div className="space-y-2">
+      <Input
+        placeholder="Node ID"
+        value={nodeData.id}
+        onChange={(e) => setNodeData({ ...nodeData, id: e.target.value })}
+      />
+      <Input
+        placeholder="Label"
+        value={nodeData.label}
+        onChange={(e) => setNodeData({ ...nodeData, label: e.target.value })}
+      />
+      <Input
+        placeholder="Description"
+        value={nodeData.description}
+        onChange={(e) => setNodeData({ ...nodeData, description: e.target.value })}
+      />
+      <Input
+        placeholder="Type"
+        value={nodeData.type}
+        onChange={(e) => setNodeData({ ...nodeData, type: e.target.value })}
+      />
+      <Button onClick={handleSubmit}>Add Node</Button>
+    </div>
+  );
+};
+
+export { Card, CardHeader, CardContent, BulletinBoard, NodeForm }
