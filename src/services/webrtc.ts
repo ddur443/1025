@@ -28,6 +28,7 @@ export interface WebRTCEvents {
   'screenShareStop': () => void;
   'meetingLog': (data: LogEntry) => void;
   'error': (error: Error) => void;
+  'ai-suggestion': (data: AISuggestion) => void; // 新增 AI 建議事件
 }
 
 // 添加新的介面定義
@@ -72,6 +73,12 @@ export interface LogEntry {
   type: 'join' | 'leave' | 'share' | 'message' | 'decision';
   user: string;
   content: string;
+}
+
+export interface AISuggestion {
+  id: string;
+  content: string;
+  timestamp: number;
 }
 
 export class WebRTCService extends EventEmitter {
@@ -324,6 +331,11 @@ export class WebRTCService extends EventEmitter {
         dataChannel.send(message);
       }
     });
+  }
+
+  // 新增方法來處理 AI 建議
+  handleAISuggestion(data: AISuggestion) {
+    this.emit('ai-suggestion', data);
   }
 
   cleanup() {

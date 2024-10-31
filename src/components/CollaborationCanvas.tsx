@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useWebRTC } from "@/hooks/useWebRTC";
-import { DrawingData, Point } from "@/services/webrtc";
+import { DrawingData, Point, AISuggestion } from "@/services/webrtc";
 import throttle from 'lodash/throttle';
 import { Canvas } from 'react-three-fiber';
 import { OrbitControls } from '@react-three/drei';
@@ -60,6 +60,9 @@ export const CollaborationCanvas: React.FC<{ userId: string }> = ({ userId }) =>
   const [scale, setScale] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [pointBuffer, setPointBuffer] = useState<Point[]>([]);
+
+  // AI 建議
+  const [aiSuggestions, setAISuggestions] = useState<AISuggestion[]>([]);
 
   // 初始化和清理
   useEffect(() => {
@@ -127,6 +130,11 @@ export const CollaborationCanvas: React.FC<{ userId: string }> = ({ userId }) =>
       img.src = data.data;
     };
 
+    // 處理 AI 建議
+    const handleAISuggestion = (data: AISuggestion) => {
+      setAISuggestions(prev => [...prev, data]);
+    };
+
     // 使用 data 事件進行數據傳輸
     const handleData = (data: any) => {
       switch(data.type) {
@@ -138,6 +146,9 @@ export const CollaborationCanvas: React.FC<{ userId: string }> = ({ userId }) =>
           break;
         case 'sync':
           handleSync(data);
+          break;
+        case 'ai-suggestion':
+          handleAISuggestion(data);
           break;
       }
     };
@@ -289,6 +300,16 @@ export const CollaborationCanvas: React.FC<{ userId: string }> = ({ userId }) =>
     ));
   };
 
+  // 渲染 AI 建議
+  const renderAISuggestions = () => {
+    return aiSuggestions.map(suggestion => (
+      <div key={suggestion.id} className="p-2 bg-gray-800 text-white rounded mb-2">
+        <p>{suggestion.content}</p>
+        <span className="text-xs text-gray-400">{new Date(suggestion.timestamp).toLocaleString()}</span>
+      </div>
+    ));
+  };
+
   return (
     <div className="relative w-full h-full" onWheel={handleWheel}>
       <canvas
@@ -335,6 +356,11 @@ export const CollaborationCanvas: React.FC<{ userId: string }> = ({ userId }) =>
           <OrbitControls />
           {/* 這裡可以添加 3D 圖形 */}
         </Canvas>
+      </div>
+
+      {/* AI 建議 */}
+      <div className="absolute bottom-4 left-4 w-1/4 h-1/4 bg-white p-2 overflow-y-auto">
+        {renderAISuggestions()}
       </div>
     </div>
   );
