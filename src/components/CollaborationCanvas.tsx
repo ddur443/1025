@@ -1,8 +1,10 @@
-// src/components/CollaborationCanvas.tsx
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useWebRTC } from "@/hooks/useWebRTC";
 import { DrawingData, Point } from "@/services/webrtc";
 import throttle from 'lodash/throttle';
+import { Canvas } from 'react-three-fiber';
+import { OrbitControls } from '@react-three/drei';
+import ReactFlow, { Background, Controls } from 'react-flow-renderer';
 
 interface DrawingOptions {
   color: string;
@@ -103,50 +105,49 @@ export const CollaborationCanvas: React.FC<{ userId: string }> = ({ userId }) =>
   }, [offset, scale]);
 
   // 事件處理器
-  // src/components/CollaborationCanvas.tsx
-useEffect(() => {
-  // 處理其他用戶的繪圖
-  const handleDrawing = (data: DrawingData) => {
-    drawFromPoints(data.points, data.color, data.width);
-  };
-
-  // 處理游標更新
-  const handleCursor = (data: CursorPosition) => {
-    setCursors(prev => new Map(prev).set(data.userId, data));
-  };
-
-  // 處理畫布同步
-  const handleSync = (data: CanvasState) => {
-    if (!canvasRef.current || !contextRef.current) return;
-    const img = new Image();
-    img.onload = () => {
-      contextRef.current?.clearRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
-      contextRef.current?.drawImage(img, 0, 0);
+  useEffect(() => {
+    // 處理其他用戶的繪圖
+    const handleDrawing = (data: DrawingData) => {
+      drawFromPoints(data.points, data.color, data.width);
     };
-    img.src = data.data;
-  };
 
-  // 使用 data 事件進行數據傳輸
-  const handleData = (data: any) => {
-    switch(data.type) {
-      case 'drawing':
-        handleDrawing(data);
-        break;
-      case 'cursor':
-        handleCursor(data);
-        break;
-      case 'sync':
-        handleSync(data);
-        break;
-    }
-  };
+    // 處理游標更新
+    const handleCursor = (data: CursorPosition) => {
+      setCursors(prev => new Map(prev).set(data.userId, data));
+    };
 
-  on('data', handleData);
+    // 處理畫布同步
+    const handleSync = (data: CanvasState) => {
+      if (!canvasRef.current || !contextRef.current) return;
+      const img = new Image();
+      img.onload = () => {
+        contextRef.current?.clearRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
+        contextRef.current?.drawImage(img, 0, 0);
+      };
+      img.src = data.data;
+    };
 
-  return () => {
-    // 清理事件監聽
-  };
-}, [on]);
+    // 使用 data 事件進行數據傳輸
+    const handleData = (data: any) => {
+      switch(data.type) {
+        case 'drawing':
+          handleDrawing(data);
+          break;
+        case 'cursor':
+          handleCursor(data);
+          break;
+        case 'sync':
+          handleSync(data);
+          break;
+      }
+    };
+
+    on('data', handleData);
+
+    return () => {
+      // 清理事件監聽
+    };
+  }, [on]);
 
   // 繪圖功能
   const drawFromPoints = useCallback((points: Point[], color: string, width: number) => {
@@ -318,6 +319,22 @@ useEffect(() => {
         />
         <button onClick={undo}>撤銷</button>
         <button onClick={redo}>重做</button>
+      </div>
+
+      {/* 2D 視圖 */}
+      <div className="absolute top-4 right-4 w-1/2 h-1/2 bg-white">
+        <ReactFlow>
+          <Background />
+          <Controls />
+        </ReactFlow>
+      </div>
+
+      {/* 3D 視圖 */}
+      <div className="absolute bottom-4 right-4 w-1/2 h-1/2 bg-white">
+        <Canvas>
+          <OrbitControls />
+          {/* 這裡可以添加 3D 圖形 */}
+        </Canvas>
       </div>
     </div>
   );

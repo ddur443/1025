@@ -1,4 +1,3 @@
-// pages/index.tsx
 import type { NextPage } from 'next'
 import { Button } from "../components/ui/button"
 import { Card, CardHeader, CardContent } from "../components/ui/card"
@@ -14,10 +13,14 @@ import { useState } from 'react'
 const HomePage: NextPage = () => {
   const router = useRouter();
   const [showExplore, setShowExplore] = useState(false);
+  const [userRole, setUserRole] = useState<'general' | 'helper' | null>(null);
 
-  // 添加一個導航函數
+  const handleRoleSelection = (role: 'general' | 'helper') => {
+    setUserRole(role);
+    router.push(`/login?type=${role}`);
+  };
+
   const handleTaskClick = () => {
-    // 假設我們導航到一個示例任務
     router.push('/task/1');
   };
 
@@ -32,7 +35,6 @@ const HomePage: NextPage = () => {
           <p className="text-xl text-gray-600 mb-12">選擇您的角色開始冒險</p>
 
           <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
-            {/* 一般用戶登入卡片 */}
             <Card className="hover:shadow-lg transition-shadow cursor-pointer">
               <CardContent className="p-6">
                 <div className="flex flex-col items-center">
@@ -41,14 +43,13 @@ const HomePage: NextPage = () => {
                   <p className="text-gray-600 text-center mb-4">
                     發布任務、參與項目、提供建議
                   </p>
-                  <Button onClick={() => router.push('/task/1')}>
+                  <Button onClick={() => handleRoleSelection('general')}>
                     以用戶身份進入
                   </Button>
                 </div>
               </CardContent>
             </Card>
 
-            {/* 協助者登入卡片 */}
             <Card className="hover:shadow-lg transition-shadow cursor-pointer">
               <CardContent className="p-6">
                 <div className="flex flex-col items-center">
@@ -57,7 +58,7 @@ const HomePage: NextPage = () => {
                   <p className="text-gray-600 text-center mb-4">
                     管理任務、審核建議、優化流程
                   </p>
-                  <Button onClick={() => router.push('/task/1')}>
+                  <Button onClick={() => handleRoleSelection('helper')}>
                     以協助者身份進入
                   </Button>
                 </div>
@@ -65,7 +66,6 @@ const HomePage: NextPage = () => {
             </Card>
           </div>
 
-          {/* 探索按鈕 */}
           <div className="mt-8">
             <Button 
               variant="outline"
@@ -76,7 +76,6 @@ const HomePage: NextPage = () => {
             </Button>
           </div>
 
-          {/* 探索項目區域 */}
           {showExplore && (
             <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {[1, 2, 3].map((i) => (
