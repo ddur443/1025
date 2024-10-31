@@ -1,4 +1,3 @@
-// pages/task/[id].tsx
 import type { NextPage } from 'next'
 import { Button } from "../../components/ui/button"
 import { Card, CardHeader, CardContent } from "../../components/ui/card"
@@ -16,6 +15,7 @@ import {
 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import BranchDiagram from '../../components/BranchDiagram';
 
 const TaskDetail: NextPage = () => {
   const router = useRouter();
@@ -195,10 +195,7 @@ const TaskDetail: NextPage = () => {
                 </Button>
               </div>
               <div className="h-[600px] border rounded-lg bg-white p-4">
-                {/* 這裡可以使用 react-flow 或其他流程圖庫 */}
-                <div className="flex items-center justify-center h-full text-gray-500">
-                  流程圖展示區域
-                </div>
+                <BranchDiagram />
               </div>
             </CardContent>
           </Card>

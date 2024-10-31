@@ -1,8 +1,14 @@
-// src/components/CollaborationCanvas.tsx
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useWebRTC } from "@/hooks/useWebRTC";
 import { DrawingData, Point } from "@/services/webrtc";
 import throttle from 'lodash/throttle';
+import ReactFlow, {
+  ReactFlowProvider,
+  addEdge,
+  removeElements,
+  Controls,
+  Background,
+} from 'react-flow-renderer';
 
 interface DrawingOptions {
   color: string;
@@ -28,6 +34,15 @@ interface CanvasState {
   data: string;
   timestamp: number;
 }
+
+const initialElements = [
+  {
+    id: '1',
+    type: 'input',
+    data: { label: 'Start' },
+    position: { x: 250, y: 5 },
+  },
+];
 
 export const CollaborationCanvas: React.FC<{ userId: string }> = ({ userId }) => {
   // 基本繪圖狀態
@@ -288,6 +303,30 @@ useEffect(() => {
     ));
   };
 
+  // Branch diagram state and handlers
+  const [elements, setElements] = useState(initialElements);
+  const [reactFlowInstance, setReactFlowInstance] = useState(null);
+
+  const onConnect = (params) => setElements((els) => addEdge(params, els));
+  const onElementsRemove = (elementsToRemove) =>
+    setElements((els) => removeElements(elementsToRemove, els));
+  const onLoad = (rfi) => {
+    setReactFlowInstance(rfi);
+    rfi.fitView();
+  };
+
+  const addNode = useCallback(() => {
+    const newNode = {
+      id: (elements.length + 1).toString(),
+      data: { label: `Node ${elements.length + 1}` },
+      position: {
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+      },
+    };
+    setElements((els) => els.concat(newNode));
+  }, [elements]);
+
   return (
     <div className="relative w-full h-full" onWheel={handleWheel}>
       <canvas
@@ -318,6 +357,23 @@ useEffect(() => {
         />
         <button onClick={undo}>撤銷</button>
         <button onClick={redo}>重做</button>
+      </div>
+
+      {/* Branch Diagram */}
+      <div style={{ height: 500 }}>
+        <ReactFlowProvider>
+          <ReactFlow
+            elements={elements}
+            onConnect={onConnect}
+            onElementsRemove={onElementsRemove}
+            onLoad={onLoad}
+            deleteKeyCode={46} /* 'delete'-key */
+          >
+            <Controls />
+            <Background />
+          </ReactFlow>
+          <button onClick={addNode}>Add Node</button>
+        </ReactFlowProvider>
       </div>
     </div>
   );
