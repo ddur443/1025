@@ -1,4 +1,3 @@
-// src/hooks/useWebRTC.ts
 import { useEffect, useState, useCallback } from 'react';
 import { WebRTCService, WebRTCEvents } from '@/services/webrtc';
 
@@ -22,6 +21,7 @@ export const useWebRTC = (userId: string): WebRTCHook => {
   const [webRTC, setWebRTC] = useState<WebRTCService | null>(null);
   const [connectedUsers, setConnectedUsers] = useState<string[]>([]);
   const [connectionStatus, setConnectionStatus] = useState<string>('disconnected');
+  const [isMeetingActive, setIsMeetingActive] = useState<boolean>(false);
 
   useEffect(() => {
     const service = new WebRTCService(
@@ -121,13 +121,17 @@ export const useWebRTC = (userId: string): WebRTCHook => {
     if (!webRTC) {
       throw new Error('WebRTC not initialized');
     }
+    if (!isMeetingActive) {
+      console.warn('Meeting is not active, data not sent');
+      return;
+    }
     try {
       webRTC.sendData(data);
     } catch (error) {
       console.error('Failed to send data:', error);
       throw error;
     }
-  }, [webRTC]);
+  }, [webRTC, isMeetingActive]);
 
   const on = useCallback(<K extends keyof WebRTCEvents>(
     event: K,

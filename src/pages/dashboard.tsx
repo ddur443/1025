@@ -1,4 +1,3 @@
-// pages/dashboard.tsx
 import type { NextPage } from 'next'
 import { Button } from "../components/ui/button"
 import { Card, CardHeader, CardContent } from "../components/ui/card"
@@ -13,7 +12,7 @@ import { useRouter } from 'next/router'
 
 const DashboardPage: NextPage = () => {
   const router = useRouter();
-  const isHelper = router.query.type === 'helper';
+  const { role } = router.query;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -24,12 +23,12 @@ const DashboardPage: NextPage = () => {
             <div className="flex items-center gap-2">
               <Globe className="w-6 h-6" />
               <h1 className="text-xl font-bold">
-                {isHelper ? '協助者儀表板' : '任務儀表板'}
+                {role === 'helper' ? '協助者儀表板' : '任務儀表板'}
               </h1>
             </div>
             <Button onClick={() => router.push('/create-task')}>
               <PlusCircle className="w-4 h-4 mr-2" />
-              {isHelper ? '創建新任務' : '發布任務'}
+              {role === 'helper' ? '創建新任務' : '發布任務'}
             </Button>
           </div>
         </div>
@@ -66,7 +65,7 @@ const DashboardPage: NextPage = () => {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    {isHelper ? (
+                    {role === 'helper' ? (
                       <Button variant="outline">
                         審核建議
                       </Button>

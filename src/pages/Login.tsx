@@ -1,4 +1,3 @@
-// pages/login.tsx
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { Button } from "../components/ui/button"
@@ -18,7 +17,11 @@ const LoginPage: NextPage = () => {
   const handleLogin = async () => {
     // 這裡添加實際的登入邏輯
     // 暫時模擬登入成功
-    router.push('/dashboard');
+    if (type === 'helper') {
+      router.push('/dashboard?role=helper');
+    } else {
+      router.push('/dashboard?role=general');
+    }
   };
 
   return (
