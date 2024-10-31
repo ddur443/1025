@@ -112,6 +112,10 @@ export class WebRTCService extends EventEmitter {
       this.emit('signaling-close');
       setTimeout(() => this.initializeSignaling(url), 5000);
     };
+
+    this.signalingSocket.onerror = (error) => {
+      this.emit('error', new Error(`WebSocket error: ${error.message}`));
+    };
   }
 
   private async handleSignalingMessage(message: SignalingMessage) {
